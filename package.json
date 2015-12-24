@@ -1,0 +1,28 @@
+{
+  "name": "purescript-in-purescript",
+  "version": "0.0.0",
+  "description": "purescript-in-purescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/cdepillabout/purescript-in-purescript.git"
+  },
+  "keywords": [
+    "purescript"
+  ],
+  "author": "Dennis Gosnell <cdep.illabout@gmail.com>",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/cdepillabout/purescript-in-purescript/issues"
+  },
+  "homepage": "https://github.com/cdepillabout/purescript-in-purescript#readme",
+  "dependencies": {
+    "bower": "^1.7.1",
+    "gulp": "^3.9.0",
+    "pulp": "^6.1.0",
+    "purescript": "^0.8.0-rc.1"
+  }
+}
