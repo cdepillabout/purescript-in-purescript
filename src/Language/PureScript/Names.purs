@@ -1,11 +1,12 @@
 
 module Language.PureScript.Names where
 
-import Prelude (bind, (++), (/=), (<<<), map, ($), (<$>), (<>), show)
+import Prelude (class Show, bind, (++), (/=), (<<<), map, ($), (<$>), (<>), show)
 
 import Control.Monad.Supply.Class (class MonadSupply, fresh)
 import Data.Array (filter)
 import Data.Foldable (intercalate)
+import Data.Generic (class Generic, gShow)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String (split)
 import Data.Tuple (Tuple(Tuple))
@@ -39,6 +40,9 @@ freshIdent' = GenIdent Nothing <$> fresh
 -- | Proper names, i.e. capitalized names for e.g. module names, type//data constructors.
 newtype ProperName = ProperName String
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
+derive instance genericProperName :: Generic ProperName
+instance showProperName :: Show ProperName where show = gShow
+
 
 runProperName :: ProperName -> String
 runProperName (ProperName string) = string
@@ -46,6 +50,8 @@ runProperName (ProperName string) = string
 -- | Module names
 newtype ModuleName = ModuleName (Array ProperName)
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
+derive instance genericModuleName :: Generic ModuleName
+instance showModuleName :: Show ModuleName where show = gShow
 
 runModuleName :: ModuleName -> String
 runModuleName (ModuleName pns) = intercalate "." $ map runProperName pns
@@ -57,10 +63,12 @@ moduleNameFromString =
 -- | A qualified name, i.e. a name with an optional module name
 data Qualified a = Qualified (Maybe ModuleName) a
 -- deriving (Show, Read, Eq, Ord, Data, Typeable, Functor)
+derive instance genericQualified :: Generic a => Generic (Qualified a)
+instance showQualified :: Show a => Show (Qualified a) where show = showQualified' show
 
-showQualified :: forall a . (a -> String) -> Qualified a -> String
-showQualified f (Qualified Nothing a) = f a
-showQualified f (Qualified (Just name) a) = runModuleName name ++ "." ++ f a
+showQualified' :: forall a . (a -> String) -> Qualified a -> String
+showQualified' f (Qualified Nothing a) = f a
+showQualified' f (Qualified (Just name) a) = runModuleName name ++ "." ++ f a
 
 -- instance (a ~ ProperName) => A.ToJSON (Qualified a) where
 --   toJSON = A.toJSON . showQualified runProperName

@@ -1,7 +1,9 @@
 
 module Language.PureScript.SourcePos where
 
-import Prelude (bind, (<>), show)
+import Prelude (class Show, bind, (<>), show)
+
+import Data.Generic (class Generic, gShow)
 
 -- | Source position information
 newtype SourcePos = SourcePos
@@ -11,6 +13,8 @@ newtype SourcePos = SourcePos
   , column :: Int
   }
 -- deriving (Show, Read, Eq, Ord, D.Data, D.Typeable)
+derive instance genericSourcePos :: Generic SourcePos
+instance showSourcePos :: Show SourcePos where show = gShow
 
 displaySourcePos :: SourcePos -> String
 displaySourcePos (SourcePos sourcePos) =
@@ -34,6 +38,8 @@ newtype SourceSpan = SourceSpan
   , end :: SourcePos
   }
 -- deriving (Show, Read, Eq, Ord, D.Data, D.Typeable)
+derive instance genericSourceSpan :: Generic SourceSpan
+instance showSourceSpan :: Show SourceSpan where show = gShow
 
 displayStartEndPos :: SourceSpan -> String
 displayStartEndPos (SourceSpan sourceSpan) =

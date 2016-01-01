@@ -2,9 +2,11 @@
 module Language.PureScript.Kinds where
 
 import Prelude
-    ( class Semigroup, class Monad, class Applicative, class Functor, bind
-    , (<>), (<*>), (<$>), (>>=)
+    ( class Semigroup, class Show, class Monad, class Applicative, class Functor
+    , bind, (<>), (<*>), (<$>), (>>=)
     )
+
+import Data.Generic (class Generic, gShow)
 
 -- | The data type of kinds
 data Kind
@@ -20,6 +22,8 @@ data Kind
   | FunKind Kind Kind
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
 -- $(A.deriveJSON A.defaultOptions ''Kind)
+derive instance genericKind :: Generic Kind
+instance showKind :: Show Kind where show = gShow
 
 everywhereOnKinds :: (Kind -> Kind) -> Kind -> Kind
 everywhereOnKinds f = go
