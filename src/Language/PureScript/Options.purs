@@ -9,20 +9,20 @@ import Data.Maybe (Maybe(Nothing))
 -- | The data type of compiler options
 newtype Options = Options {
     -- | Disable tail-call elimination
-    optionsNoTco :: Boolean
+    noTco :: Boolean
     -- | Disable inlining of calls to return and bind for the Eff monad
-  , optionsNoMagicDo :: Boolean
+  , noMagicDo :: Boolean
     -- | When specified, checks the type of `main` in the module, and generate a call to run main
     -- after the module definitions.
-  , optionsMain :: Maybe String
+  , main :: Maybe String
     -- | Skip all optimizations
-  , optionsNoOptimizations :: Boolean
+  , noOptimizations :: Boolean
     -- | Verbose error message
-  , optionsVerboseErrors :: Boolean
+  , verboseErrors :: Boolean
     -- | Remove the comments from the generated js
-  , optionsNoComments :: Boolean
+  , noComments :: Boolean
     -- | The path to prepend to require statements
-  , optionsRequirePath :: Maybe String
+  , requirePath :: Maybe String
   }
 derive instance genericOptions :: Generic Options
 instance showOptions :: Show Options where show = gShow
@@ -30,11 +30,11 @@ instance showOptions :: Show Options where show = gShow
 -- |
 -- Default make options
 defaultOptions :: Options
-defaultOptions = Options { optionsNoTco: false
-                         , optionsNoMagicDo: false
-                         , optionsMain: Nothing
-                         , optionsNoOptimizations: false
-                         , optionsVerboseErrors: false
-                         , optionsNoComments: false
-                         , optionsRequirePath: Nothing
+defaultOptions = Options { noTco: false
+                         , noMagicDo: false
+                         , main: Nothing
+                         , noOptimizations: false
+                         , verboseErrors: false
+                         , noComments: false
+                         , requirePath: Nothing
                          }
