@@ -20,6 +20,8 @@ data Ident
   -- | A generated name for an identifier
   | GenIdent (Maybe String) Int
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
+derive instance genericIdent :: Generic Ident
+instance showIdent :: Show Ident where show = showIdent'
 
 runIdent :: Ident -> String
 runIdent (Ident i) = i
@@ -27,9 +29,9 @@ runIdent (Op op) = op
 runIdent (GenIdent Nothing n) = "$" <> show n
 runIdent (GenIdent (Just name) n) = "$" <> name <> show n
 
-showIdent :: Ident -> String
-showIdent (Op op) = "(" <> op <> ")"
-showIdent i = runIdent i
+showIdent' :: Ident -> String
+showIdent' (Op op) = "(" <> op <> ")"
+showIdent' i = runIdent i
 
 freshIdent :: forall m . (MonadSupply m) => String -> m Ident
 freshIdent name = GenIdent (Just name) <$> fresh
