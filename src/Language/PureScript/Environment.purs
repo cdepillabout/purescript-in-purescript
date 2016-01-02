@@ -40,7 +40,7 @@ newtype Environment = Environment {
   , typeClassDictionaries :: Map (Maybe ModuleName) (Map (Qualified ProperName) (Map (Qualified Ident) TypeClassDictionaryInScope))
   -- | Type classes
   , typeClasses :: Map (Qualified ProperName)
-                       { stringKindArray :: (Array (Tuple String (Maybe Kind)))
+                       { stringKindArray :: Array (Tuple String (Maybe Kind))
                        , identTypeArray :: Array (Tuple Ident Type)
                        , constraints :: Array Constraint
                        }
@@ -49,7 +49,13 @@ newtype Environment = Environment {
 
 -- | The initial environment with no values and only the default javascript types defined
 initEnvironment :: Environment
-initEnvironment = Environment M.empty primTypes M.empty M.empty M.empty primClasses
+initEnvironment = Environment { names: M.empty
+                              , types: primTypes
+                              , dataConstructors: M.empty
+                              , typeSynonyms: M.empty
+                              , typeClassDictionaries: M.empty
+                              , typeClasses: primClasses
+                              }
 
 data NameVisibility
   -- | The name is defined in the current binding group, but is not visible
@@ -111,9 +117,9 @@ showDataDeclType Newtype = "newtype"
 primName :: String -> Qualified ProperName
 primName = Qualified (Just $ ModuleName [ProperName prim]) <<< ProperName
 
--- -- | Construct a type in the Prim module
--- primTy :: String -> Type
--- primTy = TypeConstructor . primName
+-- | Construct a type in the Prim module
+primTy :: String -> Type
+primTy = TypeConstructor <<< primName
 
 -- -- | Type constructor for functions
 -- tyFunction :: Type
@@ -187,7 +193,7 @@ primClasses :: Map (Qualified ProperName) { stringKindArray :: Array (Tuple Stri
                                           , constraints :: Array Constraint
                                           }
 primClasses =
-    singleton (primName "Partial") { stringKindArray: [], identTypeArray: [], constraints: [] }
+    M.singleton (primName "Partial") { stringKindArray: [], identTypeArray: [], constraints: [] }
 
 -- -- | Finds information about data constructors from the current environment.
 -- lookupConstructor :: Environment -> Qualified ProperName -> (DataDeclType, ProperName, Type, [Ident])

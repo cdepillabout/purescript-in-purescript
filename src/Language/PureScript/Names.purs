@@ -1,12 +1,15 @@
 
 module Language.PureScript.Names where
 
-import Prelude (class Show, bind, (++), (/=), (<<<), map, ($), (<$>), (<>), show)
+import Prelude
+    ( class Eq, class Ord, class Show, bind, (++), (/=), (<<<), map, ($), (<$>)
+    , (<>), show, (&&), eq, compare
+    )
 
 import Control.Monad.Supply.Class (class MonadSupply, fresh)
 import Data.Array (filter)
 import Data.Foldable (intercalate)
-import Data.Generic (class Generic, gShow)
+import Data.Generic (class Generic, gCompare, gEq, gShow)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.String (split)
 import Data.Tuple (Tuple(Tuple))
@@ -44,6 +47,8 @@ newtype ProperName = ProperName String
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
 derive instance genericProperName :: Generic ProperName
 instance showProperName :: Show ProperName where show = gShow
+instance eqProperName :: Eq ProperName where eq = gEq
+instance ordProperName :: Ord ProperName where compare = gCompare
 
 
 runProperName :: ProperName -> String
@@ -54,6 +59,8 @@ newtype ModuleName = ModuleName (Array ProperName)
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
 derive instance genericModuleName :: Generic ModuleName
 instance showModuleName :: Show ModuleName where show = gShow
+instance eqModuleName :: Eq ModuleName where eq = gEq
+instance ordModuleName :: Ord ModuleName where compare = gCompare
 
 runModuleName :: ModuleName -> String
 runModuleName (ModuleName pns) = intercalate "." $ map runProperName pns
@@ -67,6 +74,12 @@ data Qualified a = Qualified (Maybe ModuleName) a
 -- deriving (Show, Read, Eq, Ord, Data, Typeable, Functor)
 derive instance genericQualified :: Generic a => Generic (Qualified a)
 instance showQualified :: Show a => Show (Qualified a) where show = showQualified' show
+instance eqQualified :: (Eq a) => Eq (Qualified a) where
+    eq (Qualified moduleNameA a) (Qualified moduleNameB b) =
+        eq moduleNameA moduleNameB && eq a b
+instance ordQualified :: Ord a => Ord (Qualified a) where
+    compare (Qualified moduleNameA a) (Qualified moduleNameB b) =
+        compare moduleNameA moduleNameB <> compare a b
 
 showQualified' :: forall a . (a -> String) -> Qualified a -> String
 showQualified' f (Qualified Nothing a) = f a
