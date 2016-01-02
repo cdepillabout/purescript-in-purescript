@@ -2,14 +2,15 @@
 module Language.PureScript.Types where
 
 import Prelude
-    ( class Monad, class Applicative, class Functor, class Show, bind, map
-    , ($), (>>=), (<$>), (<*>), pure, (<<<), (||), (<>), show, (+), (/=)
+    ( class Monad, class Applicative, class Functor, class Eq, class Show, bind
+    , map, ($), (>>=), (<$>), (<*>), pure, (<<<), (||), (<>), show, (+), (/=)
+    , eq
     )
 
 import Control.Bind ((<=<))
 import Data.Array (concatMap, (:), nub, filter, uncons)
 import Data.Foldable (foldl, foldr, notElem, elem)
-import Data.Generic (class Generic, gShow)
+import Data.Generic (class Generic, gEq, gShow)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(Tuple), snd, fst, lookup)
@@ -61,6 +62,7 @@ data Type
 -- deriving (Show, Read,Eq, Ord, Data, Typeable)
 derive instance genericType :: Generic Type
 instance showType :: Show Type where show = gShow
+instance eqType :: Eq Type where eq = gEq
 
 -- | A typeclass constraint
 type Constraint = Tuple (Qualified ProperName) (Array Type)

@@ -25,6 +25,8 @@ data Ident
 -- deriving (Show, Read, Eq, Ord, Data, Typeable)
 derive instance genericIdent :: Generic Ident
 instance showIdent :: Show Ident where show = showIdent'
+instance eqIdent :: Eq Ident where eq = gEq
+instance ordIdent :: Ord Ident where compare = gCompare
 
 runIdent :: Ident -> String
 runIdent (Ident i) = i

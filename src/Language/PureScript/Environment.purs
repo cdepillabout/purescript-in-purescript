@@ -121,53 +121,53 @@ primName = Qualified (Just $ ModuleName [ProperName prim]) <<< ProperName
 primTy :: String -> Type
 primTy = TypeConstructor <<< primName
 
--- -- | Type constructor for functions
--- tyFunction :: Type
--- tyFunction = primTy "Function"
+-- | Type constructor for functions
+tyFunction :: Type
+tyFunction = primTy "Function"
 
--- -- | Type constructor for strings
--- tyString :: Type
--- tyString = primTy "String"
+-- | Type constructor for strings
+tyString :: Type
+tyString = primTy "String"
 
--- -- | Type constructor for strings
--- tyChar :: Type
--- tyChar = primTy "Char"
+-- | Type constructor for strings
+tyChar :: Type
+tyChar = primTy "Char"
 
--- -- | Type constructor for numbers
--- tyNumber :: Type
--- tyNumber = primTy "Number"
+-- | Type constructor for numbers
+tyNumber :: Type
+tyNumber = primTy "Number"
 
--- -- | Type constructor for integers
--- tyInt :: Type
--- tyInt = primTy "Int"
+-- | Type constructor for integers
+tyInt :: Type
+tyInt = primTy "Int"
 
--- -- | Type constructor for booleans
--- tyBoolean :: Type
--- tyBoolean = primTy "Boolean"
+-- | Type constructor for booleans
+tyBoolean :: Type
+tyBoolean = primTy "Boolean"
 
--- -- | Type constructor for arrays
--- tyArray :: Type
--- tyArray = primTy "Array"
+-- | Type constructor for arrays
+tyArray :: Type
+tyArray = primTy "Array"
 
--- -- | Type constructor for objects
--- tyObject :: Type
--- tyObject = primTy "Object"
+-- | Type constructor for objects
+tyObject :: Type
+tyObject = primTy "Object"
 
--- -- | Check whether a type is an object
--- isObject :: Type -> Bool
--- isObject = isTypeOrApplied tyObject
+-- | Check whether a type is an object
+isObject :: Type -> Boolean
+isObject = isTypeOrApplied tyObject
 
--- -- | Check whether a type is a function
--- isFunction :: Type -> Bool
--- isFunction = isTypeOrApplied tyFunction
+-- | Check whether a type is a function
+isFunction :: Type -> Boolean
+isFunction = isTypeOrApplied tyFunction
 
--- isTypeOrApplied :: Type -> Type -> Bool
--- isTypeOrApplied t1 (TypeApp t2 _) = t1 == t2
--- isTypeOrApplied t1 t2 = t1 == t2
+isTypeOrApplied :: Type -> Type -> Boolean
+isTypeOrApplied t1 (TypeApp t2 _) = t1 == t2
+isTypeOrApplied t1 t2 = t1 == t2
 
--- -- | Smart constructor for function types
--- function :: Type -> Type -> Type
--- function t1 = TypeApp (TypeApp tyFunction t1)
+-- | Smart constructor for function types
+function :: Type -> Type -> Type
+function t1 = TypeApp (TypeApp tyFunction t1)
 
 -- | The primitive types in the external javascript environment with their
 -- associated kinds. There is also a pseudo `Partial` type that corresponds to
@@ -195,18 +195,30 @@ primClasses :: Map (Qualified ProperName) { stringKindArray :: Array (Tuple Stri
 primClasses =
     M.singleton (primName "Partial") { stringKindArray: [], identTypeArray: [], constraints: [] }
 
--- -- | Finds information about data constructors from the current environment.
--- lookupConstructor :: Environment -> Qualified ProperName -> (DataDeclType, ProperName, Type, [Ident])
--- lookupConstructor env ctor =
---   fromMaybe (internalError "Data constructor not found") $ ctor `M.lookup` dataConstructors env
+-- | Finds information about data constructors from the current environment.
+lookupConstructor :: Environment
+                  -> Qualified ProperName
+                  -> { dataDecl :: DataDeclType
+                     , properName :: ProperName
+                     , type :: Type
+                     , idents :: Array Ident
+                     }
+lookupConstructor (Environment env) ctor =
+  fromMaybe (internalError "Data constructor not found") $ ctor `M.lookup` env.dataConstructors
 
--- -- | Checks whether a data constructor is for a newtype.
--- isNewtypeConstructor :: Environment -> Qualified ProperName -> Bool
--- isNewtypeConstructor e ctor = case lookupConstructor e ctor of
---   (Newtype, _, _, _) -> True
---   (Data, _, _, _) -> False
+-- | Checks whether a data constructor is for a newtype.
+isNewtypeConstructor :: Environment -> Qualified ProperName -> Boolean
+isNewtypeConstructor env ctor =
+    case lookupConstructor env ctor of
+        { dataDecl: Newtype, properName: _, type: _, idents: _ } -> true
+        { dataDecl: Data, properName: _, type: _, idents: _ } -> false
 
--- -- | Finds information about values from the current environment.
--- lookupValue :: Environment -> Qualified Ident -> Maybe (Type, NameKind, NameVisibility)
--- lookupValue env (Qualified (Just mn) ident) = (mn, ident) `M.lookup` names env
--- lookupValue _ _ = Nothing
+-- | Finds information about values from the current environment.
+lookupValue :: Environment
+            -> Qualified Ident
+            -> Maybe { type :: Type
+                     , nameKind :: NameKind
+                     , nameVisibility :: NameVisibility
+                     }
+lookupValue (Environment env) (Qualified (Just mn) ident) = Tuple mn ident `M.lookup` env.names
+lookupValue _ _ = Nothing
